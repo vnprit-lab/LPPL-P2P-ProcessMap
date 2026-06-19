@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LPPL | Procure-to-Pay Process Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg-primary: #0a0f1c;
+    --bg-card: #111827;
+    --bg-card-hover: #1a2332;
+    --border-card: #1e2d44;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-green: #10b981;
+    --accent-purple: #8b5cf6;
+    --glow-blue: rgba(59, 130, 246, 0.3);
+    --glow-red: rgba(239, 68, 68, 0.4);
+    --glow-green: rgba(16, 185, 129, 0.3);
+    --spine-color: #1e3a5f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header {
+    position: relative;
+    z-index: 10;
+    padding: 40px 0 30px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-card);
+    background: linear-gradient(180deg, rgba(10, 15, 28, 1) 0%, rgba(17, 24, 39, 0.8) 100%);
+  }
+
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .header-sub span {
+    color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 20px 20px 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .tab {
+    padding: 10px 24px;
+    border: 1px solid var(--border-card);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.3px;
+    user-select: none;
+    font-family: inherit;
+  }
+
+  .tab:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+  .tab.active {
+    color: var(--accent-cyan);
+    background: var(--bg-primary);
+    border-color: var(--accent-cyan);
+    border-bottom: 2px solid var(--bg-primary);
+    font-weight: 600;
+  }
+
+  .tab-content { display: none; position: relative; z-index: 5; }
+  .tab-content.active { display: block; }
+
+  .flow-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    position: relative;
+  }
+
+  .spine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, transparent, var(--spine-color) 5%, var(--spine-color) 95%, transparent);
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .particle {
+    position: absolute;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    animation: particleFlow 8s linear infinite;
+    opacity: 0;
+    box-shadow: 0 0 8px var(--accent-cyan);
+    z-index: 2;
+  }
+
+  @keyframes particleFlow {
+    0% { top: 0%; opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  .node {
+    position: relative;
+    z-index: 5;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .node.left { flex-direction: row; padding-right: 52%; }
+  .node.right { flex-direction: row-reverse; padding-left: 52%; }
+  .node.center { justify-content: center; padding: 0 15%; }
+
+  .node-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .node-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--node-accent, var(--accent-blue));
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .node-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--node-accent, var(--accent-blue));
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 20px var(--node-glow, var(--glow-blue));
+  }
+
+  .node-card:hover::before { opacity: 1; }
+
+  .node-number {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--node-accent, var(--accent-blue));
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+
+  .node-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .node-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .node-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-role { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+  .tag-system { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+  .tag-tat { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+  .tag-gate { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+  .node-card.gate {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 20px var(--glow-red);
+    --node-accent: var(--accent-red);
+    --node-glow: var(--glow-red);
+  }
+
+  .node-card.gate::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-red);
+    animation: gatePulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes gatePulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.01); }
+  }
+
+  .spine-dot {
+    position: absolute;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    background: var(--bg-primary);
+    border: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    transform: translate(-50%, 50%);
+    z-index: 3;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .node:hover .spine-dot {
+    background: var(--accent-blue);
+    box-shadow: 0 0 12px var(--glow-blue);
+  }
+
+  .gate-dot {
+    border-color: var(--accent-red) !important;
+    background: var(--accent-red) !important;
+    box-shadow: 0 0 12px var(--glow-red);
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    background: #1a2744;
+    border: 1px solid var(--accent-cyan);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--text-primary);
+    z-index: 100;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    line-height: 1.6;
+  }
+
+  .node-card:hover .tooltip {
+    display: block;
+    top: calc(100% + 8px);
+    left: 0;
+  }
+
+  .tooltip-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-cyan);
+    margin-bottom: 6px;
+  }
+
+  .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    gap: 16px;
+  }
+
+  .tooltip-row:last-child { border: none; }
+
+  /* RACI */
+  .raci-container { max-width: 1100px; margin: 30px auto; padding: 0 20px; overflow-x: auto; }
+
+  .raci-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .raci-table th {
+    background: #1a2744;
+    color: var(--accent-cyan);
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid var(--border-card);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .raci-table th:first-child { text-align: left; min-width: 260px; }
+
+  .raci-table td {
+    padding: 10px 8px;
+    border: 1px solid var(--border-card);
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .raci-table td:first-child { text-align: left; color: var(--text-secondary); }
+  .raci-table tr:hover td { background: rgba(59, 130, 246, 0.05); }
+
+  .raci-cat {
+    background: rgba(6, 182, 212, 0.08) !important;
+    font-weight: 700 !important;
+    color: var(--accent-cyan) !important;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .r-cell { color: #3b82f6; font-weight: 700; }
+  .a-cell { color: #ef4444; font-weight: 700; }
+  .c-cell { color: #10b981; font-weight: 700; }
+  .i-cell { color: #f59e0b; font-weight: 700; }
+  .e-cell { color: #8b5cf6; font-weight: 700; }
+  .dash-cell { color: #334155; }
+
+  .raci-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .raci-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .raci-legend-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 12px;
+  }
+
+  /* DoA */
+  .doa-container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+
+  .doa-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+  }
+
+  .doa-card:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  .doa-class {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .doa-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .doa-value { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+
+  .doa-flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+  .doa-step {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-blue);
+  }
+
+  .doa-arrow { color: var(--text-muted); font-size: 16px; }
+
+  /* KPI */
+  .kpi-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-cyan);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .kpi-number {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+
+  .kpi-unit { font-size: 12px; color: var(--text-secondary); }
+
+  .kpi-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 30px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-card);
+  }
+
+  .footer {
+    text-align: center;
+    padding: 30px;
+    border-top: 1px solid var(--border-card);
+    color: var(--text-muted);
+    font-size: 12px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .footer span { color: var(--accent-cyan); }
+
+  @media (max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .node.left, .node.right { padding: 0 10px 0 40px; flex-direction: column; }
+    .node.center { padding: 0 10px 0 40px; }
+    .spine { left: 20px; }
+    .spine-dot { left: 20px; }
+    .tabs { flex-wrap: wrap; }
+    .tab { font-size: 12px; padding: 8px 14px; }
+    .doa-flow { flex-direction: column; align-items: flex-start; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .tooltip { max-width: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Pace Digitek Limited &bull; Energy Segment</div>
+  <h1>Procure-to-Pay Process Map</h1>
+  <div class="header-sub"><span>PDL / LPPL / PREPL</span> &nbsp;|&nbsp; SAP Business One &nbsp;|&nbsp; BESS Manufacturing</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="flow">Process Flow</button>
+  <button class="tab" data-tab="raci">RACI Matrix</button>
+  <button class="tab" data-tab="doa">DoA Matrix</button>
+  <button class="tab" data-tab="kpi">KPIs &amp; TATs</button>
+</div>
+
+<!-- TAB 1: PROCESS FLOW -->
+<div id="tab-flow" class="tab-content active">
+  <div class="flow-container">
+    <div class="spine"></div>
+    <div class="particle" style="animation-delay: 0s;"></div>
+    <div class="particle" style="animation-delay: 2s;"></div>
+    <div class="particle" style="animation-delay: 4s;"></div>
+    <div class="particle" style="animation-delay: 6s;"></div>
+
+    <!-- Node 1 -->
+    <div class="node left">
+      <div class="node-card" style="--node-accent: #06b6d4; --node-glow: rgba(6,182,212,0.3);">
+        <div class="node-number">Phase 01</div>
+        <div class="node-title">Demand Planning &amp; Forecasting</div>
+        <div class="node-desc">Sales provides 12-month rolling forecasts. Engineering shares BOM to SCM. SCM provides budget cost. FC ensures procurement stays within budgeted cost.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">Sales &rarr; SCM</span>
+          <span class="tag tag-role">Engineering</span>
+          <span class="tag tag-system">SAP B1</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Handoff Details</div>
+          <div class="tooltip-row"><span>Forecast Cycle</span><span>12-month rolling, monthly plans</span></div>
+          <div class="tooltip-row"><span>BOM Flow</span><span>Engineering &rarr; SCM &rarr; FC</span></div>
+          <div class="tooltip-row"><span>Deviation Approval</span><span>Management Committee</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Node 2 -->
+    <div class="node right">
+      <div class="node-card" style="--node-accent: #8b5cf6; --node-glow: rgba(139,92,246,0.3);">
+        <div class="node-number">Phase 02</div>
+        <div class="node-title">Production Lock &amp; MRP Run</div>
+        <div class="node-desc">PPC publishes the Production Plan. Production Head signs off. SCM executes MRP run immediately. POs generated based on DoA and ideal inventory levels.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">PPC</span>
+          <span class="tag tag-role">SCM</span>
+          <span class="tag tag-tat">Import: 45-day notice</span>
+          <span class="tag tag-tat">Local: 30-day notice</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Control Points</div>
+          <div class="tooltip-row"><span>Change Auth</span><span>Production Head or COO</span></div>
+          <div class="tooltip-row"><span>Lead-time Flag</span><span>SCM &rarr; FC within 24 hrs</span></div>
+          <div class="tooltip-row"><span>Class A/B</span><span>12M forecast, 3M binding</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #8b5cf6;"></div>
+    </div>
+
+    <!-- Node 3 -->
+    <div class="node left">
+      <div class="node-card">
+        <div class="node-number">Phase 03</div>
+        <div class="node-title">Vendor Strategy &amp; Onboarding</div>
+        <div class="node-desc">Three-vendor mandate per category. MSA with warranties, PBG, certifications. Triad approval: SCM Head + FC + Legal. MSME/Non-MSME/Import/RCM tagging in SAP.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">SCM Head</span>
+          <span class="tag tag-role">FC</span>
+          <span class="tag tag-role">Legal</span>
+          <span class="tag tag-system">SAP B1 Vendor Master</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Vendor Gate Checklist</div>
+          <div class="tooltip-row"><span>KYC Docs</span><span>16-point checklist (Annexure 1)</span></div>
+          <div class="tooltip-row"><span>Financial Check</span><span>3-yr ITR + Audited BS</span></div>
+          <div class="tooltip-row"><span>Technical</span><span>Lab test + R&amp;D sign-off (A/B)</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Gate 1 -->
+    <div class="node center">
+      <div class="node-card gate">
+        <div class="node-number" style="color: var(--accent-red);">&#x26A0; Control Gate 1</div>
+        <div class="node-title">PR Budget Validation Gate</div>
+        <div class="node-desc">Every PR validated against quarterly project budget and BOM. PR must be system-generated in SAP B1 (no email/Excel PRs). Stores confirms stock unavailability before PR creation.</div>
+        <div class="node-tags">
+          <span class="tag tag-gate">HARD STOP</span>
+          <span class="tag tag-role">FP&amp;A validates</span>
+          <span class="tag tag-role">FC approves</span>
+          <span class="tag tag-system">SAP B1 PR Module</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Gate Rules</div>
+          <div class="tooltip-row"><span>Budget Breach</span><span>System hard-block</span></div>
+          <div class="tooltip-row"><span>BOM Mismatch</span><span>Auto-reject</span></div>
+          <div class="tooltip-row"><span>Stock Available</span><span>PR not created</span></div>
+        </div>
+      </div>
+      <div class="spine-dot gate-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Node 5 -->
+    <div class="node right">
+      <div class="node-card" style="--node-accent: #f59e0b; --node-glow: rgba(245,158,11,0.3);">
+        <div class="node-number">Phase 04</div>
+        <div class="node-title">PO Issuance &amp; 1-Page Commercials</div>
+        <div class="node-desc">Every PO tagged to Sales Order/Project ID. Includes 1-page commercial summary: tax, Incoterms, LD clauses. 3-month expiry clock. HSN codes mandatory. Legal format compliance.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">SCM creates</span>
+          <span class="tag tag-role">FC reviews</span>
+          <span class="tag tag-tat">3-month PO expiry</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">PO Controls</div>
+          <div class="tooltip-row"><span>Amendment &gt;5%</span><span>Original approver + FC</span></div>
+          <div class="tooltip-row"><span>No SO Tag</span><span>No approval (hard stop)</span></div>
+          <div class="tooltip-row"><span>Legal Format</span><span>Standard template per Legal</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #f59e0b;"></div>
+    </div>
+
+    <!-- Node 6 -->
+    <div class="node left">
+      <div class="node-card" style="--node-accent: #ef4444; --node-glow: rgba(239,68,68,0.2);">
+        <div class="node-number">Phase 05</div>
+        <div class="node-title">DoA Approval Workflow</div>
+        <div class="node-desc">System-based approvals. Physical PO signing not required post initial approval. Annualized limits per vendor per item. Approval mail attached to SAP.</div>
+        <div class="node-tags">
+          <span class="tag tag-gate">Class A: &gt;5 Cr &rarr; COO+CFO</span>
+          <span class="tag tag-gate">Class B: 1-5 Cr &rarr; COO</span>
+          <span class="tag tag-tat">Class C: &lt;1 Cr &rarr; FC</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Approval Tiers</div>
+          <div class="tooltip-row"><span>Class A (&gt;5 Cr)</span><span>SCM &rarr; SCM Head &rarr; FC &rarr; COO &amp; CFO</span></div>
+          <div class="tooltip-row"><span>Class B (1-5 Cr)</span><span>SCM &rarr; SCM Head &rarr; FC &rarr; COO</span></div>
+          <div class="tooltip-row"><span>Class C (&lt;1 Cr)</span><span>SCM &rarr; SCM Head &rarr; FC</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #ef4444;"></div>
+    </div>
+
+    <!-- Node 7 -->
+    <div class="node right">
+      <div class="node-card">
+        <div class="node-number">Phase 06</div>
+        <div class="node-title">Logistics &amp; Import Clearance</div>
+        <div class="node-desc">Monthly duty forecast on 1st working day. Finance earmarks duty funds. Logistics validates Incoterms. CHA manages documentation and customs filing.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">Logistics</span>
+          <span class="tag tag-role">Finance/Treasury</span>
+          <span class="tag tag-tat">Duty: AM same day</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Import Flow</div>
+          <div class="tooltip-row"><span>Pre-Alert</span><span>30-day arrivals report</span></div>
+          <div class="tooltip-row"><span>Fund Earmark</span><span>Finance allocates next-month duty</span></div>
+          <div class="tooltip-row"><span>Scope</span><span>Duty + liner DO + CFS + incidentals</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Gate 2 -->
+    <div class="node center">
+      <div class="node-card gate">
+        <div class="node-number" style="color: var(--accent-red);">&#x26A0; Control Gate 2</div>
+        <div class="node-title">48-Hour Port Evacuation Rule</div>
+        <div class="node-desc">Non-negotiable TAT. Goods must clear port/CFS within 48 hours of duty clearance. Transport pre-scheduled before duty payment. Warehouse confirms storage readiness.</div>
+        <div class="node-tags">
+          <span class="tag tag-gate">48-HR HARD STOP</span>
+          <span class="tag tag-role">Logistics owns</span>
+          <span class="tag tag-gate">Exception &rarr; FC + COO alert</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Escalation</div>
+          <div class="tooltip-row"><span>Breach</span><span>Auto-alert to FC + COO</span></div>
+          <div class="tooltip-row"><span>Avoidable Costs</span><span>Chargeback to responsible dept</span></div>
+          <div class="tooltip-row"><span>LC Shipments</span><span>+1-2 days allowed</span></div>
+        </div>
+      </div>
+      <div class="spine-dot gate-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Node 9 -->
+    <div class="node left">
+      <div class="node-card" style="--node-accent: #10b981; --node-glow: rgba(16,185,129,0.3);">
+        <div class="node-number">Phase 07</div>
+        <div class="node-title">Warehouse &amp; Stores Control</div>
+        <div class="node-desc">24-hour GRN rule. QC inspection before production release. Manual Security Register + digital movement report, synced weekly with SCM. Periodic physical verification by cross-functional team.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">Stores Head</span>
+          <span class="tag tag-tat">GRN: 24 hrs</span>
+          <span class="tag tag-system">SAP B1 GRN</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Stores Gates</div>
+          <div class="tooltip-row"><span>GRN Entry</span><span>Within 24 hours of arrival</span></div>
+          <div class="tooltip-row"><span>Production Issue</span><span>Only after GRN + QC pass</span></div>
+          <div class="tooltip-row"><span>Physical Audit</span><span>Cross-functional team &rarr; FC + COO</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #10b981;"></div>
+    </div>
+
+    <!-- Gate 3 -->
+    <div class="node center">
+      <div class="node-card gate">
+        <div class="node-number" style="color: var(--accent-red);">&#x26A0; Control Gate 3</div>
+        <div class="node-title">Mandatory 4-Way Match</div>
+        <div class="node-desc">System-driven hard-block. No payment without: Approved PO + Finalized GRN + QC Inspection Report + Vendor Invoice. Failed match requires original PO approver sign-off.</div>
+        <div class="node-tags">
+          <span class="tag tag-gate">HARD BLOCK</span>
+          <span class="tag tag-role">AP Head verifies</span>
+          <span class="tag tag-tat">Rejection: 1-day TAT</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">The Four Pillars</div>
+          <div class="tooltip-row"><span>Pillar 1</span><span>Approved PO (price + tags + terms)</span></div>
+          <div class="tooltip-row"><span>Pillar 2</span><span>Finalized GRN (physical receipt)</span></div>
+          <div class="tooltip-row"><span>Pillar 3</span><span>QC Inspection Report (BESS standards)</span></div>
+          <div class="tooltip-row"><span>Pillar 4</span><span>Vendor Invoice (qty + price match)</span></div>
+        </div>
+      </div>
+      <div class="spine-dot gate-dot" style="top: 30px;"></div>
+    </div>
+
+    <!-- Node 11 -->
+    <div class="node right">
+      <div class="node-card" style="--node-accent: #f59e0b; --node-glow: rgba(245,158,11,0.3);">
+        <div class="node-number">Phase 08</div>
+        <div class="node-title">Payment Mechanism</div>
+        <div class="node-desc">Bi-weekly payment rhythm (Tue/Thu). AP Head extracts Ready-to-Pay list from SAP. SCM reviews for quality disputes. FC gives final sign-off. Statutory payments prioritized.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">AP Head</span>
+          <span class="tag tag-role">FC approves</span>
+          <span class="tag tag-tat">Bi-weekly cycle</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Payment Controls</div>
+          <div class="tooltip-row"><span>Standard Advance</span><span>Max 10% of PO value</span></div>
+          <div class="tooltip-row"><span>New Vendor Advance</span><span>Max 5% (&lt;6 months history)</span></div>
+          <div class="tooltip-row"><span>Advance &gt;10%</span><span>CFO approval required</span></div>
+          <div class="tooltip-row"><span>BG/Security</span><span>Mandatory for all advances</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #f59e0b;"></div>
+    </div>
+
+    <!-- Node 12 -->
+    <div class="node left">
+      <div class="node-card" style="--node-accent: #8b5cf6; --node-glow: rgba(139,92,246,0.3);">
+        <div class="node-number">Phase 09</div>
+        <div class="node-title">LC Three-Key Process</div>
+        <div class="node-desc">Treasury drafts LC from approved PO. FC vets financial risk. SCM Head validates delivery alignment. Vendor reviews and accepts. Formal issuance within 5 working days.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">Treasury</span>
+          <span class="tag tag-role">FC</span>
+          <span class="tag tag-role">SCM Head</span>
+          <span class="tag tag-tat">5 working days</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">LC Workflow</div>
+          <div class="tooltip-row"><span>Step 1</span><span>Treasury drafts from PO + DoA</span></div>
+          <div class="tooltip-row"><span>Step 2</span><span>FC + SCM Head internal vetting</span></div>
+          <div class="tooltip-row"><span>Step 3</span><span>Vendor written acceptance</span></div>
+          <div class="tooltip-row"><span>Step 4</span><span>Issuance + SFMS to SCM</span></div>
+          <div class="tooltip-row"><span>Acceptance TAT</span><span>AP vets within 1 day</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #8b5cf6;"></div>
+    </div>
+
+    <!-- Node 13 -->
+    <div class="node right">
+      <div class="node-card" style="--node-accent: #06b6d4; --node-glow: rgba(6,182,212,0.3);">
+        <div class="node-number">Phase 10</div>
+        <div class="node-title">MIS &amp; Audit Compliance</div>
+        <div class="node-desc">Weekly payment coordination. Monthly anomaly report: split POs, GRN aging &gt;24hrs, demurrage incidents. Digital audit trails timestamped in SAP B1.</div>
+        <div class="node-tags">
+          <span class="tag tag-role">AP Head</span>
+          <span class="tag tag-role">FP&amp;A</span>
+          <span class="tag tag-system">SAP B1 Audit Trail</span>
+        </div>
+        <div class="tooltip">
+          <div class="tooltip-label">Reports</div>
+          <div class="tooltip-row"><span>Weekly</span><span>Payment list + SCM verification</span></div>
+          <div class="tooltip-row"><span>Monthly</span><span>Anomaly &amp; performance deviations</span></div>
+          <div class="tooltip-row"><span>Continuous</span><span>Digital 4-way match archive</span></div>
+        </div>
+      </div>
+      <div class="spine-dot" style="top: 30px; border-color: #06b6d4;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TAB 2: RACI -->
+<div id="tab-raci" class="tab-content">
+  <div class="raci-container">
+    <div class="raci-legend">
+      <div class="raci-legend-item"><div class="raci-legend-dot" style="background: rgba(59,130,246,0.2); color: #3b82f6;">R</div>Responsible</div>
+      <div class="raci-legend-item"><div class="raci-legend-dot" style="background: rgba(239,68,68,0.2); color: #ef4444;">A</div>Accountable</div>
+      <div class="raci-legend-item"><div class="raci-legend-dot" style="background: rgba(16,185,129,0.2); color: #10b981;">C</div>Consulted</div>
+      <div class="raci-legend-item"><div class="raci-legend-dot" style="background: rgba(245,158,11,0.2); color: #f59e0b;">I</div>Informed</div>
+      <div class="raci-legend-item"><div class="raci-legend-dot" style="background: rgba(139,92,246,0.2); color: #8b5cf6;">E</div>Escalation</div>
+    </div>
+    <table class="raci-table" id="raci-table"></table>
+  </div>
+</div>
+
+<!-- TAB 3: DOA -->
+<div id="tab-doa" class="tab-content">
+  <div class="doa-container">
+    <div class="doa-card" style="border-left: 4px solid #ef4444;">
+      <div class="doa-class" style="color: #ef4444;">Class A &mdash; Primary Components</div>
+      <div class="doa-title">Strategic Items</div>
+      <div class="doa-value">Annualized value &gt; &#x20B9;5 Crores per vendor</div>
+      <div class="doa-flow">
+        <div class="doa-step">SCM Initiates</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step">SCM Head</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step">Finance Controller</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step" style="background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #ef4444;">COO &amp; CFO</div>
+      </div>
+    </div>
+    <div class="doa-card" style="border-left: 4px solid #f59e0b;">
+      <div class="doa-class" style="color: #f59e0b;">Class B &mdash; Secondary Components</div>
+      <div class="doa-title">Operational Items</div>
+      <div class="doa-value">Annualized value &#x20B9;1 Cr &ndash; &#x20B9;5 Crores</div>
+      <div class="doa-flow">
+        <div class="doa-step">SCM Initiates</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step">SCM Head</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step">Finance Controller</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step" style="background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3); color: #f59e0b;">COO</div>
+      </div>
+    </div>
+    <div class="doa-card" style="border-left: 4px solid #10b981;">
+      <div class="doa-class" style="color: #10b981;">Class C &mdash; Consumables</div>
+      <div class="doa-title">Off-the-Shelf / Spares</div>
+      <div class="doa-value">Annualized value &lt; &#x20B9;1 Crore</div>
+      <div class="doa-flow">
+        <div class="doa-step">SCM Initiates</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step">SCM Head</div>
+        <div class="doa-arrow">&rarr;</div>
+        <div class="doa-step" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3); color: #10b981;">Finance Controller</div>
+      </div>
+    </div>
+    <div class="doa-card" style="border-left: 4px solid #8b5cf6;">
+      <div class="doa-class" style="color: #8b5cf6;">Class S &mdash; Cells &amp; Containers</div>
+      <div class="doa-title">Excluded from A/B/C classification</div>
+      <div class="doa-value">Per SCM directive &mdash; separate commercial track</div>
+      <div class="doa-flow">
+        <div class="doa-step">Managed directly by SCM Head + COO</div>
+      </div>
+    </div>
+    <div style="margin-top: 24px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 8px; font-size: 13px; color: var(--text-secondary);">
+      <strong style="color: var(--accent-cyan);">Key Rules:</strong> Approvals are system-based and time-bound. Physical PO signing not required post Step 1. Approval mail attached to SAP B1. Tendering threshold: &#x20B9;25 Lakh annualized (under review for high-volume items). FC present for all Class A/B negotiations (excluding cells/containers).
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: KPIs -->
+<div id="tab-kpi" class="tab-content">
+  <div class="kpi-container">
+    <div class="kpi-section-title">Critical Turnaround Times</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">GRN Entry</div><div class="kpi-number">24h</div><div class="kpi-unit">from material arrival</div></div>
+      <div class="kpi-card"><div class="kpi-label">Port Evacuation</div><div class="kpi-number">48h</div><div class="kpi-unit">from duty clearance</div></div>
+      <div class="kpi-card"><div class="kpi-label">Invoice Rejection</div><div class="kpi-number">1 day</div><div class="kpi-unit">resolution TAT</div></div>
+      <div class="kpi-card"><div class="kpi-label">LC Issuance</div><div class="kpi-number">5 days</div><div class="kpi-unit">from all sign-offs</div></div>
+      <div class="kpi-card"><div class="kpi-label">LC Acceptance</div><div class="kpi-number">1 day</div><div class="kpi-unit">AP vetting TAT</div></div>
+      <div class="kpi-card"><div class="kpi-label">Lead-Time Conflict Flag</div><div class="kpi-number">24h</div><div class="kpi-unit">SCM to FC + Production</div></div>
+      <div class="kpi-card"><div class="kpi-label">Import Plan Change</div><div class="kpi-number">45 days</div><div class="kpi-unit">advance notice required</div></div>
+      <div class="kpi-card"><div class="kpi-label">Local Plan Change</div><div class="kpi-number">30 days</div><div class="kpi-unit">advance notice required</div></div>
+    </div>
+
+    <div class="kpi-section-title">Payment Controls</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Payment Cycle</div><div class="kpi-number">2x</div><div class="kpi-unit">per week (Tue / Thu)</div></div>
+      <div class="kpi-card"><div class="kpi-label">Standard Advance Cap</div><div class="kpi-number">10%</div><div class="kpi-unit">of PO value</div></div>
+      <div class="kpi-card"><div class="kpi-label">New Vendor Advance</div><div class="kpi-number">5%</div><div class="kpi-unit">&lt;6 months history &rarr; COO approval</div></div>
+      <div class="kpi-card"><div class="kpi-label">Interest Penalty</div><div class="kpi-number">12%</div><div class="kpi-unit">p.a. on missed delivery</div></div>
+    </div>
+
+    <div class="kpi-section-title">Inventory Controls</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Inventory Review</div><div class="kpi-number">Bi-weekly</div><div class="kpi-unit">SCM + FC joint review</div></div>
+      <div class="kpi-card"><div class="kpi-label">PO Expiry</div><div class="kpi-number">3 months</div><div class="kpi-unit">max validity period</div></div>
+      <div class="kpi-card"><div class="kpi-label">Price Amendment</div><div class="kpi-number">&gt;5%</div><div class="kpi-unit">requires FC review + original approver</div></div>
+      <div class="kpi-card"><div class="kpi-label">MIS Anomaly Report</div><div class="kpi-number">Monthly</div><div class="kpi-unit">split POs, GRN aging, demurrage</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>PACE DIGITEK LIMITED</span> &nbsp;|&nbsp; Energy Segment &nbsp;|&nbsp; Procure-to-Pay SOP V7 &nbsp;|&nbsp; CONFIDENTIAL<br>
+  PDL / LPPL / PREPL &nbsp;|&nbsp; SAP Business One
+</div>
+
+<script>
+// Tab switching — bulletproof version
+document.querySelectorAll('.tab').forEach(function(tabBtn) {
+  tabBtn.addEventListener('click', function() {
+    var tabId = this.getAttribute('data-tab');
+    document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); });
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.getElementById('tab-' + tabId).classList.add('active');
+    this.classList.add('active');
+  });
+});
+
+// RACI table
+(function() {
+  var roles = ["PPC", "SCM", "Stores", "AP", "FP&A", "FC", "COO/CFO", "Legal", "Treasury"];
+  var data = [
+    { cat: "1. Demand Planning & Forecasting" },
+    ["12-month rolling forecast & monthly plan", "C", "R", "-", "-", "C", "A", "I", "-", "-"],
+    ["BOM sharing to SCM", "R", "C", "-", "-", "-", "I", "-", "-", "-"],
+    ["Budget cost for BOM", "-", "R", "-", "-", "C", "A", "I", "-", "-"],
+    ["Production Plan sign-off", "R", "C", "-", "-", "-", "A", "I", "-", "-"],
+    ["MRP run execution", "C", "R", "-", "-", "-", "I", "-", "-", "-"],
+    { cat: "2. Vendor Strategy & Onboarding" },
+    ["Three-vendor mandate", "-", "R", "-", "-", "-", "A", "I", "-", "-"],
+    ["MSA negotiation & sign-off", "-", "R", "-", "-", "-", "A", "I", "C", "-"],
+    ["Vendor KYC & integrity pact", "-", "R", "-", "-", "-", "C", "-", "C", "-"],
+    ["SAP B1 vendor classification", "-", "R", "-", "C", "-", "A", "-", "-", "-"],
+    { cat: "3. PR & Procurement" },
+    ["PR initiation", "R", "C", "C", "-", "-", "I", "-", "-", "-"],
+    ["PR budget validation", "-", "C", "-", "-", "R", "A", "-", "-", "-"],
+    ["Material classification (A/B/C/S)", "-", "R", "-", "-", "-", "A", "I", "-", "-"],
+    ["Commercial negotiation (A/B)", "-", "R", "-", "-", "-", "A", "A", "-", "-"],
+    { cat: "4. PO Issuance & DoA" },
+    ["PO creation with SO tag", "-", "R", "-", "-", "-", "A", "-", "-", "-"],
+    ["DoA approval (Class A)", "-", "R", "-", "-", "-", "A", "A", "-", "-"],
+    ["DoA approval (Class B)", "-", "R", "-", "-", "-", "A", "A", "-", "-"],
+    ["DoA approval (Class C)", "-", "R", "-", "-", "-", "A", "-", "-", "-"],
+    ["1-page commercial summary", "-", "R", "-", "-", "-", "C", "-", "C", "-"],
+    ["PO amendment (>5%)", "-", "R", "-", "-", "-", "A", "E", "-", "-"],
+    { cat: "5. Logistics & Import" },
+    ["Monthly duty forecast", "-", "R", "-", "-", "-", "I", "-", "-", "-"],
+    ["Duty fund earmarking", "-", "I", "-", "-", "C", "A", "-", "-", "R"],
+    ["48-hour port evacuation", "-", "R", "C", "-", "-", "E", "E", "-", "-"],
+    ["CHA TAT monitoring", "-", "R", "-", "-", "-", "I", "-", "-", "-"],
+    { cat: "6. Warehouse & Stores" },
+    ["24-hour GRN entry", "-", "I", "R", "-", "-", "I", "-", "-", "-"],
+    ["QC inspection & clearance", "C", "-", "R", "-", "-", "-", "-", "-", "-"],
+    ["Material issuance (post gates)", "-", "-", "R", "-", "-", "-", "-", "-", "-"],
+    ["Physical verification & audits", "-", "-", "R", "-", "C", "A", "I", "-", "-"],
+    { cat: "7. Payment Mechanism" },
+    ["Bi-weekly payment list", "-", "C", "-", "R", "-", "A", "-", "-", "-"],
+    ["4-way match verification", "-", "C", "-", "R", "-", "A", "-", "-", "-"],
+    ["Statutory payments", "-", "-", "-", "R", "-", "A", "-", "-", "C"],
+    ["Advance payment approval", "-", "R", "-", "C", "-", "A", "-", "-", "-"],
+    ["BG/security collection", "-", "R", "-", "-", "-", "A", "-", "C", "-"],
+    { cat: "8. LC Process" },
+    ["LC draft preparation", "-", "C", "-", "-", "-", "I", "-", "-", "R"],
+    ["Internal vetting", "-", "C", "-", "-", "-", "A", "-", "-", "R"],
+    ["Vendor review & acceptance", "-", "R", "-", "-", "-", "I", "-", "-", "C"],
+    ["Final LC issuance", "-", "I", "-", "-", "-", "A", "-", "-", "R"],
+    { cat: "9. MIS & Audit" },
+    ["Weekly payment coordination", "-", "C", "-", "R", "-", "A", "-", "-", "-"],
+    ["Monthly anomaly report", "-", "C", "C", "R", "C", "A", "I", "-", "-"],
+    ["Digital audit trail (SAP B1)", "-", "-", "-", "R", "C", "A", "-", "-", "-"]
+  ];
+
+  var table = document.getElementById('raci-table');
+  var html = '<thead><tr><th>Activity</th>';
+  for (var r = 0; r < roles.length; r++) { html += '<th>' + roles[r] + '</th>'; }
+  html += '</tr></thead><tbody>';
+
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i];
+    if (row.cat) {
+      html += '<tr><td class="raci-cat" colspan="10">' + row.cat + '</td></tr>';
+    } else {
+      html += '<tr><td>' + row[0] + '</td>';
+      for (var j = 1; j < row.length; j++) {
+        var v = row[j];
+        var cls = v === 'R' ? 'r-cell' : v === 'A' ? 'a-cell' : v === 'C' ? 'c-cell' : v === 'I' ? 'i-cell' : v === 'E' ? 'e-cell' : 'dash-cell';
+        html += '<td class="' + cls + '">' + v + '</td>';
+      }
+      html += '</tr>';
+    }
+  }
+  html += '</tbody>';
+  table.innerHTML = html;
+})();
+</script>
+
+</body>
+</html>
